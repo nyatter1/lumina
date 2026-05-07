@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. THE MASTER GATE (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. HARDENED PRIMITIVES
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+    
+    function isVerified() { 
+      return isSignedIn() && request.auth.token.email_verified == true; 
+    }
+    
+    function isOwner(userId) { 
+      return isSignedIn() && request.auth.uid == userId; 
+    }
+    
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    function incoming() { 
+      return request.resource.data; 
+    }
+
+    function existing() { 
+      return resource.data; 
+    }
+
+    // Helper for relational state check
+    function getProject(projectId) {
+      return get(/databases/$(database)/documents/projects/$(projectId)).data;
+    }
+
+    // 3. VALIDATION BLUEPRINTS
+    function isValidUser(user) {
+      return user.keys().hasAll(['id', 'email', 'displayName', 'createdAt']) &&
+             user.displayName is string && user.displayName.size() <= 64;
+    }
+
+    function isValidProject(p) {
+      return p.keys().hasAll(['id', 'title', 'ownerId', 'status', 'visibility', 'createdAt', 'updatedAt']) &&
+             p.title is string && p.title.size() <= 200 &&
+             p.ownerId == request.auth.uid;
+    }
+
+    // 4. COLLECTION RULES
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'bio', 'stats', 'following', 'followers']) &&
+                    isValidUser(incoming());
+    }
+
+    match /projects/{projectId} {
+      function _isProjectMember(proj) {
+        return proj.ownerId == request.auth.uid || proj.collaborators.exists(c, c.userId == request.auth.uid);
+      }
+
+      allow get: if isValidId(projectId) && (
+        existing().visibility == 'public' || _isProjectMember(existing())
+      );
+      
+      allow list: if isSignedIn() && (
+        resource.data.visibility == 'public' || resource.data.ownerId == request.auth.uid || 
+        resource.data.collaborators.exists(c, c.userId == request.auth.uid)
+      );
+      
+      allow create: if isVerified() && isValidId(projectId) && isValidProject(incoming());
+      
+      allow update: if isVerified() && _isProjectMember(existing()) && (
+        // Action: Metadata update (Editor+)
+        (incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'status', 'tags', 'metadata', 'updatedAt']) &&
+         (existing().ownerId == request.auth.uid || existing().collaborators.exists(c, c.userId == request.auth.uid && c.role == 'editor'))) ||
+        // Action: Admin update (Owner only)
+        (incoming().diff(existing()).affectedKeys().hasOnly(['collaborators', 'visibility']) && 
+         existing().ownerId == request.auth.uid)
+      );
+      
+      allow delete: if isOwner(existing().ownerId);
+
+      // Relational Sub-resources
+      match /chapters/{chapterId} {
+        allow read: if _isProjectMember(getProject(projectId));
+        allow write: if isVerified() && _isProjectMember(getProject(projectId));
+      }
+      
+      match /comments/{commentId} {
+        allow read: if _isProjectMember(getProject(projectId));
+        allow create: if isVerified() && _isProjectMember(getProject(projectId));
+        allow update, delete: if isSignedIn() && (existing().authorId == request.auth.uid || isOwner(getProject(projectId).ownerId));
+      }
+    }
+
+    match /notifications/{notificationId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isOwner(existing().userId) && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

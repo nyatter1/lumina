@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "bio": { "type": "string" },
+        "followers": { "type": "array", "items": { "type": "string" } },
+        "following": { "type": "array", "items": { "type": "string" } },
+        "stats": {
+          "type": "object",
+          "properties": {
+            "booksPublished": { "type": "number" },
+            "totalWordCount": { "type": "number" },
+            "writingStreak": { "type": "number" }
+          }
+        },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "email", "displayName", "createdAt"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Book project metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "coverURL": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "collaborators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string" },
+              "role": { "type": "string", "enum": ["owner", "editor", "viewer"] }
+            }
+          }
+        },
+        "status": { "type": "string", "enum": ["draft", "writing", "editing", "published"] },
+        "visibility": { "type": "string", "enum": ["private", "public"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "type": "object" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "title", "ownerId", "status", "visibility", "createdAt", "updatedAt"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "Book chapter content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "order": { "type": "number" },
+        "folderId": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "projectId", "title", "content", "order", "createdAt", "updatedAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "In-line comment or feedback",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "text": { "type": "string" },
+        "selectionRange": { "type": "object" },
+        "resolved": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "projectId", "chapterId", "authorId", "text", "resolved", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "link": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "userId", "type", "title", "message", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "projects/{projectId}": {
+      "schema": "Project",
+      "description": "Main project documents"
+    },
+    "projects/{projectId}/chapters/{chapterId}": {
+      "schema": "Chapter",
+      "description": "Chapters belonging to a project"
+    },
+    "projects/{projectId}/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Comments on a project"
+    },
+    "notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    }
+  }
+}
