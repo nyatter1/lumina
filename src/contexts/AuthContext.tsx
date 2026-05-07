@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: fUser.uid,
             email: fUser.email || '',
             displayName: fUser.displayName || 'Author',
-            photoURL: fUser.photoURL || undefined,
+            photoURL: fUser.photoURL || null,
             followers: [],
             following: [],
             stats: {
