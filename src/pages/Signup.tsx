@@ -46,7 +46,7 @@ export default function Signup() {
         >
           <div className="space-y-2">
             <h1 className="text-3xl font-display font-bold tracking-tight">Start your journey</h1>
-            <p className="text-brand-500 font-medium">Join 50,000+ authors crafting their masterpieces.</p>
+            <p className="text-brand-500 font-medium">Craft your masterpiece in a professional studio designed for modern authors.</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">

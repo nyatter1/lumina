@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { motion } from 'motion/react';
-import { Mail, Lock, Github, Chrome, ArrowRight, BookOpen } from 'lucide-react';
+import { Mail, Lock, Github, Chrome, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -109,12 +109,14 @@ export default function Login() {
             <BookOpen size={32} />
           </div>
           <div className="space-y-4">
-            <h2 className="text-4xl font-display font-bold leading-tight">"A professional workspace for the modern storyteller."</h2>
+            <h2 className="text-4xl font-display font-bold leading-tight">Lumina was built for the next generation of storytellers.</h2>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-brand-200 border border-brand-300" />
+              <div className="w-10 h-10 rounded-full bg-brand-900 border border-brand-800 flex items-center justify-center">
+                <Sparkles size={16} className="text-brand-400" />
+              </div>
               <div>
-                <p className="font-bold text-brand-900">Marcus Sterling</p>
-                <p className="text-xs text-brand-400 font-medium tracking-wide uppercase">Award-winning Author</p>
+                <p className="font-bold text-brand-900">Crafting Excellence</p>
+                <p className="text-xs text-brand-400 font-medium tracking-wide uppercase">Direct-to-Publish Workflow</p>
               </div>
             </div>
           </div>

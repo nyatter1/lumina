@@ -75,14 +75,6 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6">
         <div className="max-w-5xl mx-auto text-center space-y-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-xs font-semibold mb-4"
-          >
-            <Sparkles size={14} className="text-amber-500 fill-amber-500" />
-            <span>Used by 50,000+ authors worldwide</span>
-          </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -222,7 +214,7 @@ export default function Landing() {
           
           <div className="relative z-10 space-y-8">
             <h2 className="text-4xl lg:text-6xl font-display font-bold tracking-tight">Your story deserves a <br /><span className="text-brand-400 italic">premium</span> home.</h2>
-            <p className="text-lg text-brand-300 max-w-xl mx-auto leading-relaxed">Join 50,000+ writers who choose Lumina for their creative workspace. Get started today for free.</p>
+            <p className="text-lg text-brand-300 max-w-xl mx-auto leading-relaxed">Be among the first to experience the premium creative workspace for modern authors. Get started today for free.</p>
             <div className="pt-4">
               <Link to="/signup">
                 <Button size="lg" className="bg-white text-brand-900 hover:bg-brand-50 h-16 px-12 text-lg">
